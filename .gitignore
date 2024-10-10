@@ -1,0 +1,6 @@
+.env
+src/db.sqlite3
+*/migrations/*
+*/__pycache__
+src/media
+.pytest_cache
