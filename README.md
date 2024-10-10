@@ -47,7 +47,7 @@ An online learning hub where individuals can sign up as either mentors or studen
   $ python manage.py runserver
 ```
 
-## ⛏️ Built Using <a name = "tech"></a>
+## ⛏️ Tech stack <a name = "tech"></a>
 - [Python](https://www.python.org/doc/) v3.10.7
 - [PostgresSQL](https://www.postgresql.org/docs/current/index.html) v16.0
 - [Django](https://docs.djangoproject.com/en/5.1/) v4.2
