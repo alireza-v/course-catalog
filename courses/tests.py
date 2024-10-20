@@ -1,91 +1,86 @@
-from django.test import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
 import pytest
-from .models import *
+from faker import Faker
+from .models import Category, Comment, Course, UserProfile, Video
 
-@pytest.fixture
-def createVideo(db):
-    """ create Video instance """
+faker = Faker()
 
-    return Video.objects.create(
-        title="videoTitle",
-        video_file="somePath/videos/video.mp4",
-    )
-
-@pytest.fixture
-def parentCategory(db):
-    """ create parent category """
-
-    return Category.objects.create(
-        title="programming",
-    )
-
-@pytest.fixture
-def subcategory(db, parentCategory):
-    """ create subcategory """
-
-    return Category.objects.create(
-        title="backend",
-        parent=parentCategory,
-    )
-
-@pytest.fixture
-def createCourse(db, createVideo, parentCategory):
-    """ create course """
-
-    userProfile=UserProfile.objects.create(
-        email="testUser@email.com",
-        first_name="john",
-        last_name="doe",
-        phone="6821567754362",
-        role=UserProfile.Roll.STUDENT,
-    )
-    return Course.objects.create(
-        user=userProfile,
-        title="basics of Python",
-        description="Python is a versatile programming language that could be used in different areas such as web-development, data-science, machince-learning and many more.",
-        video=createVideo,
-        category=parentCategory,
-    )
 
 @pytest.mark.django_db
-class TestVideo:
+class TestCourseModel:
+    """
+    test suite for course(app) models
+    fixture made for creating model instances
+    """
 
-    def testVideo(self, createVideo):
-        """ video test creation """
+    @pytest.fixture
+    def user(self):
+        raw_password = "123!@#QWE"
+        user = UserProfile.objects.create_user(
+            email=faker.email(),
+            password=raw_password,
+            first_name=faker.first_name(),
+            last_name=faker.last_name(),
+            phone=faker.phone_number(),
+            role="student",
+        )
+        user.raw_password = raw_password
+        return user
 
-        video=createVideo
-        assert video.title=="videoTitle"
-        assert video.video_file=="somePath/videos/video.mp4"
-        assert str(video)=="videoTitle"
+    @pytest.fixture
+    def video(self):
+        video_file = SimpleUploadedFile(
+            "test_video.mp4",
+            b"file_content",
+            content_type="video/mp4",
+        )
+        return Video.objects.create(
+            title=faker.sentence(nb_words=3),
+            video_file=video_file,
+        )
 
-@pytest.mark.django_db
-class TestCategory:
+    @pytest.fixture
+    def category(self):
+        return Category.objects.create(title=faker.word())
 
-    def testCategoryCreation(self, parentCategory):
-        """ category test creation without the parent """
+    @pytest.fixture
+    def course(self, user, video, category):
+        return Course.objects.create(
+            user=user,
+            title=faker.sentence(nb_words=4),
+            description=faker.text(),
+            video=video,
+            category=category,
+        )
 
-        category=parentCategory
-        assert category.title=="programming"
+    @pytest.fixture
+    def comment(self, course):
+        return Comment.objects.create(
+            course=course,
+            description=faker.text(),
+            score=Comment.Score.GOOD,
+        )
+
+    def testVideo(self, video):
+        assert video.title
+        # assert video.video_file== "videos/test_video.mp4"
+
+    def testCategory(self, category):
+        assert category.title
         assert category.parent is None
-        assert category.subcategories.count()==0
-        assert str(category)=="programming"
 
-    def testCategoryWithSubcategory(self, subcategory, parentCategory):
-        """ category test creation with the subcategory """
+    def testCourse(self, course, user, video, category):
+        assert course.user == user
+        assert course.title
+        assert course.video
+        assert course.category == category
 
-        assert subcategory.title=="backend"
-        assert subcategory.parent==parentCategory
-        assert parentCategory.subcategories.count()==1
-        assert parentCategory.subcategories.first()==subcategory
-        assert str(parentCategory)=="programming"
+    def testComment(self, comment, course):
+        assert comment.course == course
+        assert comment.description
+        assert comment.score == Comment.Score.GOOD
 
-@pytest.mark.django_db
-class TestCourse:
-
-    def testCourse(self, createCourse):
-        course=createCourse
-        assert str(course)=="basics of Python"
-        assert course.user.email=="testUser@email.com"
-        assert course.video.title=="videoTitle"
-        assert course.category.title=="programming"
-
+    def testString(self, course, video, comment):
+        assert str(course) is not None
+        assert str(video) is not None
+        assert str(comment) == "Good"

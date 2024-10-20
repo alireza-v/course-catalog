@@ -1,44 +1,41 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import BaseUserManager
-from .managers import *
+from phonenumber_field.modelfields import PhoneNumberField
+from .managers import UserProfileManager
 
 
-class UserProfile(AbstractUser):
+class BaseModel(models.Model):
+    """Abstract base model which includes timestamp and updated fields"""
+
+    timestamp = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class UserProfile(AbstractUser, BaseModel):
+    """Custom user model for handling profiles with email-based authentication"""
 
     class Roll(models.TextChoices):
-        STUDENT="student", "Student"
-        MENTOR="mentor", "Mentor"
+        STUDENT = "student", "Student"
+        MENTOR = "mentor", "Mentor"
 
-    username=None
-    email=models.EmailField(unique=True)
-    first_name=models.CharField(max_length=10)
-    last_name=models.CharField(max_length=10)
-    phone=models.CharField(max_length=20)
-    role=models.CharField(max_length=10, choices=Roll.choices)
+    username = None
+    email = models.EmailField(unique=True)
+    email_is_verified = models.BooleanField(default=False, null=True)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    phone = PhoneNumberField()
+    role = models.CharField(max_length=10, choices=Roll.choices, default=Roll.STUDENT)
 
-    # is_staff=models.BooleanField(default=True)
-    # is_superuser=models.BooleanField(default=True)
-    # is_active=models.BooleanField(default=True)
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
 
-    timestamp=models.DateTimeField(auto_now_add=True)
-    updated=models.DateTimeField(auto_now=True)
+    objects = UserProfileManager()
 
-    USERNAME_FIELD="email"
-    REQUIRED_FIELDS=["first_name", "last_name"]
-
-    objects=UserProfileManager()
+    class Meta:
+        ordering = ("-timestamp",)
 
     def __str__(self):
         return self.email
-
-    def has_perm(self, perm, obj=None):
-        # if self.role==self.Roll.MENTOR:
-        #     return True
-        return True
-
-    def has_module_perms(self, app_label):
-        return True
-
-
-
