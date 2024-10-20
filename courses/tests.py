@@ -1,9 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 import pytest
 from faker import Faker
-from .models import Category, Comment, Course, UserProfile, Video
+from .models import Category, Comment, Course, Video
 
 faker = Faker()
+User = get_user_model()
 
 
 @pytest.mark.django_db
@@ -16,7 +18,7 @@ class TestCourseModel:
     @pytest.fixture
     def user(self):
         raw_password = "123!@#QWE"
-        user = UserProfile.objects.create_user(
+        user = User.objects.create_user(
             email=faker.email(),
             password=raw_password,
             first_name=faker.first_name(),

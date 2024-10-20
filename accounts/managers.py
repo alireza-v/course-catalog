@@ -4,7 +4,7 @@ from django.contrib.auth.models import BaseUserManager
 class UserProfileManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email and not password:
-            raise ValueError("email or password must be entered")
+            raise ValueError("email or password not provided")
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)

@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
@@ -6,7 +7,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
 from rest_framework import serializers
-from .models import UserProfile
+from .models import *
+
+User = get_user_model()
 
 
 class UserProfileSer(serializers.ModelSerializer):
@@ -23,7 +26,7 @@ class UserProfileSer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-        user = UserProfile.objects.create_user(
+        user = User.objects.create_user(
             email=validated_data["email"], password=password
         )
         if password:
@@ -46,9 +49,11 @@ class ResetRequestSer(serializers.Serializer):
 
     def validate_email(self, value):
         try:
-            user = UserProfile.objects.get(email=value)
-        except UserProfile.DoesNotExist:
-            raise serializers.ValidationError("User with this email does not exist.")
+            user = User.objects.get(email=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError(
+                "This email address is not associated with any account"
+            )
         self.context["user"] = user
         return value
 
@@ -74,8 +79,6 @@ class ResetRequestSer(serializers.Serializer):
         )
 
     def save(self):
-        # email= self.validated_data["email"]
-        # user= UserProfile.objects.get(email= email)
         user = self.context["user"]
         self.send_password_reset_email(user)
 
@@ -91,8 +94,8 @@ class ResetConfirmSer(serializers.Serializer):
             raise serializers.ValidationError("Passwords do not match.")
         try:
             uid = urlsafe_base64_decode(data["uid"]).decode()
-            self.user = UserProfile.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, UserProfile.DoesNotExist):
+            self.user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             raise serializers.ValidationError("invalid user id")
         token_generator = PasswordResetTokenGenerator()
         if not token_generator.check_token(self.user, data["token"]):

@@ -51,7 +51,7 @@ class Course(BaseModel):
 
 
 class Comment(BaseModel):
-    """represent comment and rating on a course by verifies users"""
+    """represent comment, rating on courses by verified users"""
 
     class Score(models.IntegerChoices):
         BAD = 1, "Bad"
