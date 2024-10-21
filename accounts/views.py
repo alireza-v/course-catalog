@@ -42,9 +42,9 @@ class RegisterView(APIView):
         return Response(ser.errors, 400)
 
 
-class ActivateMailView(APIView):
+class RequestMailActivation(APIView):
     @swagger_auto_schema(
-        operation_description="activate email",
+        operation_description="request email activation",
     )
     def post(self, request):
         """DATA HARDCODED"""
@@ -71,7 +71,8 @@ class ActivateMailView(APIView):
         return Response(ser.errors, 400)
 
 
-def activate(request, uidb64, token):
+def activateMail(request, uidb64, token):
+    """activate user email"""
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         myUser = User.objects.get(pk=uid)
@@ -151,6 +152,9 @@ class ResetConfirmView(View):
             ),
         )
 
+    @swagger_auto_schema(
+        operation_description="confirm password reset using password and password confirmation",
+    )
     def post(self, request, uidb64, token):
         ser = ResetConfirmSer(
             data=dict(

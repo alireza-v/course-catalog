@@ -4,6 +4,7 @@ from accounts.models import UserProfile
 
 class EmailBackend(ModelBackend):
     """custom authentication and that is based on email and password"""
+
     def authenticate(self, request, email=None, password=None, **kwargs):
         user = self.get_user(email)
         if user and user.check_password(password):

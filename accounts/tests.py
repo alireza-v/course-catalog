@@ -79,7 +79,7 @@ class TestAccountsView:
     def testActivateMail(self, client, user, mocker):
         """mail activation test"""
         mockedSendMail = mocker.patch.object(EmailMessage, "send", return_value=None)
-        url = reverse("activateMail")
+        url = reverse("request-mail-acc")
         response = client.post(url, data=dict(email=user.email))
         assert response.status_code == 200
         assert mockedSendMail.called
@@ -87,7 +87,7 @@ class TestAccountsView:
 
     def testActivateMailInvalidData(self, client):
         """test for invalid data sent to the email activation endpoint"""
-        url = reverse("activateMail")
+        url = reverse("request-mail-acc")
         response = client.post(url, data=dict())
         assert response.status_code == 400
 
@@ -107,7 +107,7 @@ class TestAccountsView:
 
     def testResetRequest(self, client, user):
         """request for resetting password"""
-        url = reverse("password_reset_request")
+        url = reverse("password-reset-request")
         data = dict(email=user.email)
         response = client.post(url, data)
         assert response.status_code == 200
@@ -124,7 +124,7 @@ class TestAccountsView:
         """test rendering of resetting password"""
         uidb64, token = generateTokenUid
         url = reverse(
-            "password_reset_confirm",
+            "password-reset-confirm",
             kwargs=dict(
                 uidb64=uidb64,
                 token=token,

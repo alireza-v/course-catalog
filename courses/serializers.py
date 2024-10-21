@@ -8,19 +8,19 @@ class VideoSer(serializers.ModelSerializer):
         fields = ("title", "video_file")
 
 
-class Category(serializers.ModelSerializer):
+class CategorySer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ("title", "parent")
 
 
-class Course(serializers.ModelSerializer):
+class CourseSer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ("user", "title", "description", "video", "category")
 
 
-class Comment(serializers.ModelSerializer):
+class CommentSer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ("course", "description", "score")
