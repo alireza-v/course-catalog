@@ -23,6 +23,7 @@ class UserProfile(AbstractUser, BaseModel):
 
     username = None
     email = models.EmailField(unique=True)
+    is_active = models.BooleanField(default=True)
     email_is_verified = models.BooleanField(default=False, null=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)

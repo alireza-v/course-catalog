@@ -17,9 +17,9 @@ class ViewAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ("title", "parent")
-    list_filter = ("parent",)
-    search_fields = ("title",)
+    list_display = ("name", "parent")
+    # list_filter = ("parent",)
+    # search_fields = ("title",)
 
 
 @admin.register(Course)

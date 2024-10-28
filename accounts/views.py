@@ -38,7 +38,7 @@ class RegisterView(APIView):
         ser = UserProfileSer(data=request.data)
         if ser.is_valid():
             ser.save()
-            return Response(ser.data, 201)
+            return Response(dict(message="Registration successful"), 201)
         return Response(ser.errors, 400)
 
 
@@ -72,7 +72,7 @@ class RequestMailActivation(APIView):
 
 
 def activateMail(request, uidb64, token):
-    """activate user email"""
+    """Activate user email"""
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         myUser = User.objects.get(pk=uid)
