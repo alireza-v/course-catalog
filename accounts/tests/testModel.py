@@ -1,12 +1,12 @@
-from django.urls import reverse
-from django.contrib.auth import get_user_model
-from django.core.mail import EmailMessage
-from rest_framework.test import APIClient
 import pytest
+from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.http import urlsafe_base64_encode
+from django.core.mail import EmailMessage
+from django.urls import reverse
 from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from faker import Faker
+from rest_framework.test import APIClient
 
 faker = Faker()
 User = get_user_model()

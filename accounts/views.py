@@ -1,26 +1,26 @@
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.contrib.auth import authenticate
-from django.views import View
-from django.contrib.auth import get_user_model
-from django.contrib.sites.shortcuts import get_current_site
-from django.template.loader import render_to_string
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from django.core.mail import EmailMessage
 from django.conf import settings
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMessage
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.views import View
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from drf_yasg.utils import swagger_auto_schema
+
 from .serializers import (
-    UserProfileSer,
     ActivateMailSer,
     LoginSer,
-    ResetRequestSer,
     ResetConfirmSer,
+    ResetRequestSer,
+    UserProfileSer,
 )
 
 User = get_user_model()

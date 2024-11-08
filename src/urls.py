@@ -16,10 +16,11 @@ Including another URLconf
 
 """
 
-from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
+from django.views.generic import RedirectView
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
@@ -48,6 +49,7 @@ urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="apiToken"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="apiTokenRefresh"),
     # APPS
+    path("", RedirectView.as_view(url="api/v1/auth/register/"), name="redirection"),
     path("api/v1/auth/", include("accounts.urls")),
     path("api/v1/", include("courses.urls")),
 ]

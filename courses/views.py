@@ -1,11 +1,12 @@
-from django.shortcuts import render
 from django.contrib.auth import get_user_model
-from rest_framework import permissions, generics
-from rest_framework.response import Response
-from rest_framework.request import Request
-from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser, FormParser
+from django.shortcuts import render
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, permissions
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .models import *
 from .serializers import *
 

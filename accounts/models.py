@@ -1,6 +1,7 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+
 from .managers import UserProfileManager
 
 
@@ -14,16 +15,17 @@ class BaseModel(models.Model):
         abstract = True
 
 
+class Roll(models.TextChoices):
+    STUDENT = "student", "Student"
+    MENTOR = "mentor", "Mentor"
+
+
 class UserProfile(AbstractUser, BaseModel):
     """Custom user model for handling profiles with email-based authentication"""
 
-    class Roll(models.TextChoices):
-        STUDENT = "student", "Student"
-        MENTOR = "mentor", "Mentor"
-
     username = None
     email = models.EmailField(unique=True)
-    is_active = models.BooleanField(default=True)
+    # is_active = models.BooleanField(default=True)
     email_is_verified = models.BooleanField(default=False, null=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -34,9 +36,6 @@ class UserProfile(AbstractUser, BaseModel):
     REQUIRED_FIELDS = []
 
     objects = UserProfileManager()
-
-    class Meta:
-        ordering = ("-timestamp",)
 
     def __str__(self):
         return self.email

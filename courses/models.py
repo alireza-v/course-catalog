@@ -1,5 +1,7 @@
 from django.db import models
-from accounts.models import UserProfile, BaseModel
+
+from accounts.models import BaseModel, UserProfile
+
 from .validators import validateVideoFormat
 
 

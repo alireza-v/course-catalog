@@ -1,9 +1,9 @@
-from django.urls import reverse
+import pytest
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from rest_framework.test import APIClient
-import pytest
+from django.urls import reverse
 from faker import Faker
+from rest_framework.test import APIClient
 
 from ..models import *
 from ..views import *
@@ -97,7 +97,6 @@ class TestCoursesView:
             description=faker.text(),
             video=video,
             category_name=parent.name,
-
         )
         response = client.post(url, data, format="multipart")
         assert response.status_code == 201

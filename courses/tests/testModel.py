@@ -1,9 +1,10 @@
-from django.urls import reverse
+import pytest
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from rest_framework.test import APIClient
-import pytest
+from django.urls import reverse
 from faker import Faker
+from rest_framework.test import APIClient
+
 from ..models import *
 
 faker = Faker()
