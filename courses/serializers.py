@@ -33,7 +33,6 @@ class CourseSer(serializers.ModelSerializer):
     category = serializers.CharField(source="category.name", read_only=True)
     hierarchy = serializers.SerializerMethodField()
     category_name = serializers.CharField(write_only=True)
-    # user_email = serializers.EmailField(source="user.email",read_only=True)
 
     class Meta:
         model = Course
@@ -43,7 +42,6 @@ class CourseSer(serializers.ModelSerializer):
             "title",
             "description",
             "video",
-            # "user_email",
             "category_name",
             "hierarchy",
         )
@@ -52,21 +50,9 @@ class CourseSer(serializers.ModelSerializer):
         hierarchy = []
         category = obj.category
         while category:
-            hierarchy.insert(
-                0, category.name
-            )  # Insert at the beginning for top-down order
-            category = category.parent  # Move up the parent chain
+            hierarchy.insert(0, category.name)
+            category = category.parent
         return " > ".join(hierarchy)
-
-    def validate_video(self, video):
-        """Limit video size"""
-
-        # maxSize = 100 * 1024 * 1024
-        # if video.size >= maxSize:
-        #     raise serializers.ValidationError(
-        #         f"video file size can not be greater than {maxSize}"
-        #     )
-        return video
 
     def create(self, validated_data):
         category_name = validated_data.pop("category_name", None)
@@ -75,7 +61,6 @@ class CourseSer(serializers.ModelSerializer):
 
 
 class CommentSer(serializers.ModelSerializer):
-    # course = serializers.CharField(source="course.title")
     course = serializers.SlugRelatedField(
         queryset=Course.objects.all(),
         slug_field="title",
@@ -87,7 +72,6 @@ class CommentSer(serializers.ModelSerializer):
 
 
 class FavoriteSer(serializers.ModelSerializer):
-    # course = serializers.CharField(write_only=True)
     course = serializers.SlugRelatedField(
         queryset=Course.objects.all(),
         slug_field="title",

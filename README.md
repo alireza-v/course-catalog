@@ -12,7 +12,7 @@
 
 ## 🧐 About <a name = "about"></a>
 
-An online learning hub where individuals can sign up as either mentors or students. Mentor memberships must be verified by the admin before mentors can upload video courses on various subjects, sharing their expertise with the community. Students can watch the courses, rate the content, and leave comments for further engagement. Some courses may require payment for access, and a wallet feature is available for users to add credits for internal payments.
+An online learning hub where individuals can sign up as either mentors or students. Mentor memberships must be verified by the admin before mentors can upload video courses on various subjects, sharing their expertise with the community. Students can watch the courses, rate the content, and leave comments for further engagement
 
 
 

@@ -1,6 +1,6 @@
 from django.db import models
 
-from accounts.models import BaseModel, UserProfile
+from accounts.models import *
 
 from .validators import validateVideoFormat
 
@@ -12,7 +12,6 @@ class Video(BaseModel):
     video_file = models.FileField(
         upload_to="videos/", null=True, blank=True, validators=[validateVideoFormat]
     )
-    # length=models.DurationField(help_text="duration of the video")
 
     def __str__(self):
         return self.title
@@ -43,7 +42,7 @@ class Course(BaseModel):
     """represent course uploaded by users"""
 
     user = models.ForeignKey(
-        UserProfile, on_delete=models.CASCADE, related_name="courses"
+        CustomUser, on_delete=models.CASCADE, related_name="courses"
     )
     title = models.CharField(max_length=50, null=True, blank=True, unique=True)
     description = models.TextField(null=True, blank=True)
@@ -63,7 +62,7 @@ class ScoreChoices(models.IntegerChoices):
 class Comment(BaseModel):
     """represent comment, rating on courses by verified users"""
 
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
     course = models.ForeignKey(
         Course, on_delete=models.CASCADE, null=True, related_name="comments"
     )
@@ -76,7 +75,7 @@ class Comment(BaseModel):
 
 class Favorite(BaseModel):
     user = models.ForeignKey(
-        UserProfile, on_delete=models.CASCADE, related_name="favorites_user"
+        CustomUser, on_delete=models.CASCADE, related_name="favorites_user"
     )
     course = models.ForeignKey(
         Course, on_delete=models.CASCADE, related_name="favorites_course"
@@ -89,9 +88,3 @@ class Favorite(BaseModel):
 
     def __str__(self):
         return self.course.title
-
-
-class Wallet(models.Model):
-    # """represent users's wallet for transactions and balance"""
-
-    ...

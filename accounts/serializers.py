@@ -13,12 +13,13 @@ from .models import *
 User = get_user_model()
 
 
-class UserProfileSer(serializers.ModelSerializer):
+class CustomUserSer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    role = serializers.CharField()
 
     class Meta:
-        model = UserProfile
-        fields = ("email", "password")
+        model = CustomUser
+        fields = ("email", "password", "role", "is_superuser")
         extra_kwargs = dict(
             password=dict(
                 write_only=True,
@@ -28,7 +29,9 @@ class UserProfileSer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop("password")
         user = User.objects.create_user(
-            email=validated_data["email"], password=password
+            email=validated_data.get("email"),
+            password=password,
+            role=validated_data.get("role"),
         )
         if password:
             user.set_password(password)

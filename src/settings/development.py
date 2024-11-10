@@ -25,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY", default=None, cast=str)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -43,10 +43,12 @@ INSTALLED_APPS = [
     "drf_yasg",
     "pytest_django",
     "phonenumber_field",
-    # internal
+    # django apps
     "accounts",
     "courses",
 ]
+
+AUTH_USER_MODEL = "accounts.CustomUser"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -59,7 +61,6 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
 )
 
-AUTH_USER_MODEL = "accounts.UserProfile"
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
@@ -69,13 +70,22 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer", "Token"),
 }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     },
+# }
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    },
+        "ENGINE": "django.db.backends.postgresql",
+        "USER": config("USER", default=None, cast=str),
+        "NAME": config("NAME", default=None, cast=str),
+        "PASSWORD": config("PASSWORD", default=None, cast=str),
+        "HOST": config("HOST", default="localhost", cast=str),
+        "PORT": config("PORT", default="5432", cast=str),
+    }
 }
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

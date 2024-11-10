@@ -37,6 +37,7 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     # SWAGGER
@@ -49,7 +50,7 @@ urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="apiToken"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="apiTokenRefresh"),
     # APPS
-    path("", RedirectView.as_view(url="api/v1/auth/register/"), name="redirection"),
+    path("", RedirectView.as_view(url="swagger/"), name="swagger-redirection"),
     path("api/v1/auth/", include("accounts.urls")),
     path("api/v1/", include("courses.urls")),
 ]

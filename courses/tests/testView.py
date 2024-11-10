@@ -39,11 +39,11 @@ class TestCoursesView:
         return parentCategory, childCategory
 
     @pytest.fixture
-    def course(self, db, user, video, category):
+    def course(self, db, user_mentor, video, category):
         """Course fixture"""
         parent, child = category
         return Course.objects.create(
-            user=user,
+            user=user_mentor,
             title=faker.sentence(nb_words=4),
             description=faker.text(),
             video=video,
@@ -61,34 +61,48 @@ class TestCoursesView:
         )
 
     @pytest.fixture
-    def jwt(self, client, user):
+    def jwt_student(self, client, user_student):
         """Send a post request to get access and refresh token for protected views"""
         url = reverse("apiToken")
         response = client.post(
             url,
             data=dict(
-                email=user.email,
+                email=user_student.email,
                 password="123!@#",
             ),
         )
         tokens = response.json()
         return (tokens["access"], tokens["refresh"])
 
-    def testCategory(self, client, jwt):
+    @pytest.fixture
+    def jwt_mentor(self, client, user_mentor):
+        """Send a post request to get access and refresh token for protected views"""
+        url = reverse("apiToken")
+        response = client.post(
+            url,
+            data=dict(
+                email=user_mentor.email,
+                password="123!@#",
+            ),
+        )
+        tokens = response.json()
+        return (tokens["access"], tokens["refresh"])
+
+    def testCategory(self, client, jwt_student):
         """test list group of categories"""
         ...
 
-    def testCourseGET(self, client, jwt):
+    def testCourseGET(self, client, jwt_student):
         """Test GET request courses"""
-        access, refresh = jwt
+        access, refresh = jwt_student
         url = reverse("course-lc")
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
         response = client.get(url)
         assert response.status_code == 200
 
-    def testCoursePOST(self, client, jwt, video, category):
+    def testCoursePOST(self, client, jwt_mentor, video, category):
         """Test POST request courses"""
-        access, refresh = jwt
+        access, refresh = jwt_mentor
         parent, child = category
         url = reverse("course-lc")
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
@@ -101,17 +115,17 @@ class TestCoursesView:
         response = client.post(url, data, format="multipart")
         assert response.status_code == 201
 
-    def testCourseRetrieve(self, jwt, client, course):
+    def testCourseRetrieve(self, jwt_student, client, course):
         """Test Course view with pk"""
-        access, refresh = jwt
+        access, refresh = jwt_student
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
         url = reverse("course-lookup", kwargs=dict(pk=course.id))
         response = client.get(url)
         assert response.status_code == 200
 
-    def testCourseUpdatePUT(self, jwt, client, course, category):
+    def testCourseUpdate(self, jwt_mentor, client, course, category):
         """Test update(PUT) Course view with pk"""
-        access, refresh = jwt
+        access, refresh = jwt_mentor
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
         parent, child = category
         updatedData = dict(
@@ -124,26 +138,26 @@ class TestCoursesView:
         response = client.put(url, updatedData)
         assert response.status_code == 200
 
-    def testCourseDestroy(self, jwt, client, course):
+    def testCourseDestroy(self, jwt_mentor, client, course):
         """Test destroy Course view with pk"""
-        access, refresh = jwt
+        access, refresh = jwt_mentor
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
         url = reverse("course-lookup", kwargs=dict(pk=course.id))
         response = client.delete(url)
         assert response.status_code == 204
         assert not Course.objects.filter(pk=course.id).exists()
 
-    def testCommentGET(self, jwt, client):
+    def testCommentGET(self, jwt_student, client):
         """Test comment get request"""
-        access, refresh = jwt
+        access, refresh = jwt_student
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
         url = reverse("comment")
         response = client.get(url)
         assert response.status_code == 200
 
-    def testCommentPOST(self, course, jwt, client):
+    def testCommentPOST(self, course, jwt_student, client):
         """Comment test post request"""
-        access, refresh = jwt
+        access, refresh = jwt_student
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
         url = reverse("comment")
         data = dict(
@@ -154,15 +168,15 @@ class TestCoursesView:
         response = client.post(url, data)
         assert response.status_code == 201
 
-    def testListFavorite(self, jwt, client, course):
+    def testListFavorite(self, jwt_student, client, course):
         """Test list/create favorite courses"""
-        access, refresh = jwt
+        access, refresh = jwt_student
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
         url = reverse("list-create-favorite")
         data = dict(
             course=course.title,
         )
-        response = client.get(url)
+        responseGET = client.get(url)
         responsePOST = client.post(url, data)
-        assert response.status_code == 200
+        assert responseGET.status_code == 200
         assert responsePOST.status_code == 201

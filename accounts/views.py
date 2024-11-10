@@ -10,41 +10,55 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views import View
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import permissions
+from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .permissions import *
 from .serializers import (
     ActivateMailSer,
+    CustomUserSer,
     LoginSer,
     ResetConfirmSer,
     ResetRequestSer,
-    UserProfileSer,
 )
 
 User = get_user_model()
 
 
-class RegisterView(APIView):
-    permission_classes = (permissions.AllowAny,)
+class RegisterListCreate(generics.ListCreateAPIView):
+    queryset = User.objects.all().order_by("-id")
+    serializer_class = CustomUserSer
+
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [permissions.AllowAny()]
+        if self.request.method == "GET":
+            return [IsSuperUser()]
 
     @swagger_auto_schema(
-        operation_description="register user using email and password",
-        request_body=UserProfileSer,
-        responses={201: UserProfileSer},
+        operation_summary="Retrieve all users (Superuser only)",
+        operation_description="Get list of all users",
+        responses={200: CustomUserSer(many=True)},
     )
-    def post(self, request):
-        ser = UserProfileSer(data=request.data)
-        if ser.is_valid():
-            ser.save()
-            return Response(dict(message="Registration successful"), 201)
-        return Response(ser.errors, 400)
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_summary="Register new user",
+        operation_description="Create new user using email and password",
+        request_body=CustomUserSer,
+        responses={201: CustomUserSer},
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 
 class RequestMailActivation(APIView):
     @swagger_auto_schema(
-        operation_description="request email activation",
+        operation_summary="Email activation request",
+        operation_description="Email activation request",
     )
     def post(self, request):
         """DATA HARDCODED"""
@@ -91,8 +105,10 @@ class LoginView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="login using email and password",
+        operation_summary="Login using email and password",
+        operation_description="Login using email and password",
         request_body=LoginSer,
+        responses={200: LoginSer},
     )
     def post(self, request):
         ser = LoginSer(data=request.data)
@@ -112,7 +128,7 @@ class LoginView(APIView):
             else:
                 return Response(
                     dict(
-                        error="invalid email or password",
+                        error="Invalid email or password",
                     ),
                     400,
                 )
@@ -123,7 +139,8 @@ class ResetRequestView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     @swagger_auto_schema(
-        operation_description="reset password request",
+        operation_summary="Reset password request",
+        operation_description="Reset password request",
         request_body=ResetRequestSer,
         responses={200: ResetRequestSer},
     )
@@ -133,7 +150,7 @@ class ResetRequestView(APIView):
             ser.save()
             return Response(
                 dict(
-                    message="reset link has been sent",
+                    message="Reset link has been sent",
                 ),
                 200,
             )
@@ -153,7 +170,8 @@ class ResetConfirmView(View):
         )
 
     @swagger_auto_schema(
-        operation_description="confirm password reset using password and password confirmation",
+        operation_summary="Confirm password reset using password and password confirmation",
+        operation_description="Confirm password reset using password and password confirmation",
     )
     def post(self, request, uidb64, token):
         ser = ResetConfirmSer(
@@ -168,7 +186,7 @@ class ResetConfirmView(View):
             ser.save()
             return JsonResponse(
                 dict(
-                    message="reset password success",
+                    message="Reset password success",
                 )
             )
         return render(

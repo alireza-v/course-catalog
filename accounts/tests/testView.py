@@ -37,10 +37,7 @@ class TestAccountsView:
 
     def testRegisteration(self, client):
         """Registration test using email and password"""
-        data = dict(
-            email=faker.email(),
-            password=faker.password(),
-        )
+        data = dict(email=faker.email(), password=faker.password(), role="student")
         url = reverse("register")
         response = client.post(url, data)
 
@@ -82,7 +79,7 @@ class TestAccountsView:
         data = dict(email=user.email)
         response = client.post(url, data)
         assert response.status_code == 200
-        assert response.data["message"] == "reset link has been sent"
+        assert response.data["message"] == "Reset link has been sent"
 
     @pytest.fixture
     def generateTokenUid(self, user):

@@ -12,11 +12,19 @@ User = get_user_model()
 
 
 @pytest.fixture
-def user(db):
-    """Create CustomUser instance"""
+def user_student(db):
+    """CustomUser instance with student role"""
     user = User.objects.create_user(
-        email="test@email.com",
-        password="123!@#",
+        email="student@email.com", password="123!@#", role="student"
+    )
+    return user
+
+
+@pytest.fixture
+def user_mentor(db):
+    """CustomUser instance with mentor role"""
+    user = User.objects.create_user(
+        email="mentor@email.com", password="123!@#", role="mentor"
     )
     return user
 
@@ -46,11 +54,11 @@ class TestCourseModel:
         return parentCategory, childCategory
 
     @pytest.fixture
-    def course(self, db, user, video, category):
+    def course(db, user_mentor, video, category):
         """Course fixture"""
         parent, child = category
         return Course.objects.create(
-            user=user,
+            user=user_mentor,
             title=faker.sentence(nb_words=4),
             description=faker.text(),
             video=video,
@@ -58,20 +66,20 @@ class TestCourseModel:
         )
 
     @pytest.fixture
-    def comment(self, db, course, user):
+    def comment(self, db, course, user_student):
         """Comment fixture"""
         return Comment.objects.create(
-            user=user,
+            user=user_student,
             course=course,
             description=faker.text(),
             score=ScoreChoices.GOOD,
         )
 
     @pytest.fixture
-    def favorite(db, user, course):
+    def favorite(db, user_student, course):
         """Favorite instance test"""
         return Favorite.objects.create(
-            user=user,
+            user=user_student,
             course=course,
         )
 
@@ -86,8 +94,8 @@ class TestCourseModel:
         assert child.parent == parent
         assert parent.subcategories.filter(id=child.id).exists()
 
-    def testCourse(self, course, user, video, category):
-        assert course.user == user
+    def testCourse(self, course, user_mentor, video, category):
+        assert course.user == user_mentor
         assert course.title
         assert course.video
         assert course.category
