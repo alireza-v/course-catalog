@@ -12,7 +12,7 @@ class CommentAdmin(admin.ModelAdmin):
 
 
 @admin.register(Video)
-class ViewAdmin(admin.ModelAdmin):
+class VideoAdmin(admin.ModelAdmin):
     list_display = ("title", "video_file")
 
 

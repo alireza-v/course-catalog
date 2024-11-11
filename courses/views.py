@@ -16,7 +16,7 @@ User = get_user_model()
 
 
 class CategoryList(generics.ListAPIView):
-    """Category lists"""
+    """List of categories"""
 
     permission_classes = (permissions.AllowAny,)
     queryset = Category.objects.all()
@@ -70,7 +70,6 @@ class CourseListCreate(generics.ListCreateAPIView):
 class CourseRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     """get/update/delete the Fovorite instance model"""
 
-    # permission_classes = (permissions.IsAuthenticated,)
     queryset = Course.objects.all()
     serializer_class = CourseSer
 
@@ -108,7 +107,6 @@ class CourseRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CommentListCreate(generics.ListCreateAPIView):
-    # permission_classes = (permissions.IsAuthenticated,)
     queryset = Comment.objects.all()
     serializer_class = CommentSer
 

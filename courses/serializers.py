@@ -7,6 +7,8 @@ User = get_user_model()
 
 
 class VideoSer(serializers.ModelSerializer):
+    """Video serializer including title and video_file"""
+
     class Meta:
         model = Video
         fields = ("title", "video_file")
@@ -61,6 +63,8 @@ class CourseSer(serializers.ModelSerializer):
 
 
 class CommentSer(serializers.ModelSerializer):
+    """Comment serializer including course using its title reference,description and score"""
+
     course = serializers.SlugRelatedField(
         queryset=Course.objects.all(),
         slug_field="title",
@@ -72,6 +76,8 @@ class CommentSer(serializers.ModelSerializer):
 
 
 class FavoriteSer(serializers.ModelSerializer):
+    """Favorite serializer using Course instance via title field"""
+
     course = serializers.SlugRelatedField(
         queryset=Course.objects.all(),
         slug_field="title",

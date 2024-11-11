@@ -39,7 +39,7 @@ class Category(BaseModel):
 
 
 class Course(BaseModel):
-    """represent course uploaded by users"""
+    """Courses uploaded by users using mentor role"""
 
     user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name="courses"
@@ -74,6 +74,8 @@ class Comment(BaseModel):
 
 
 class Favorite(BaseModel):
+    """Favorite courses tagged by users"""
+
     user = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name="favorites_user"
     )
